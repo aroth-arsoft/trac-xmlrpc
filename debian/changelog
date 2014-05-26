@@ -1,3 +1,9 @@
+trac-xmlrpc (1.1.2+svn13939~aroth~ppa2) trusty; urgency=medium
+
+  * fixed trouble on dh_python2
+
+ -- Andreas Roth <aroth@arsoft-online.com>  Mon, 26 May 2014 07:44:33 +0200
+
 trac-xmlrpc (1.1.2+svn13939~aroth~ppa1) trusty; urgency=medium
 
   * grab and build latest version

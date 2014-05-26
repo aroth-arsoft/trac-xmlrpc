@@ -1,7 +1,11 @@
 #!/usr/bin/make -f
 
-DEB_PYTHON2_MODULE_PACKAGES=trac-xmlrpc
-DEB_SRCDIR=trunk
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/python-distutils.mk
+%:
+	dh $@ --with python2
+
+override_dh_clean:
+	dh_clean
+	[ -d *.egg-info ] && rm -rf *.egg-info || true
