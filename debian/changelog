@@ -1,3 +1,10 @@
+trac-xmlrpc (1.1.2+svn13939~aroth~ppa3) xenial; urgency=medium
+
+  * switch to pybuild
+  * add missing SOURCES.txt
+
+ -- Andreas Roth <aroth@arsoft-online.com>  Fri, 15 Jul 2016 07:51:26 +0200
+
 trac-xmlrpc (1.1.2+svn13939~aroth~ppa2) trusty; urgency=medium
 
   * fixed trouble on dh_python2
