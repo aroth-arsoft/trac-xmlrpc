@@ -7,7 +7,7 @@ Vcs-Svn: svn://svn.debian.org/svn/python-apps/packages/trac-xmlrpc/trunk/
 Vcs-Browser: http://svn.debian.org/viewsvn/python-apps/packages/trac-xmlrpc/trunk/
 Build-Depends: debhelper (>= 9), python (>= 2.7), dh-python, python-setuptools
 X-Python-Version: >=2.7
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Homepage: http://trac-hacks.org/wiki/XmlRpcPlugin
 
 Package: trac-xmlrpc

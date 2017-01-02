@@ -1,3 +1,9 @@
+trac-xmlrpc (1.1.5+svn16171-1~aroth1) yakkety; urgency=medium
+
+  * new upstream version 1.1.5
+
+ -- Andreas Roth <aroth@arsoft-online.com>  Mon, 02 Jan 2017 15:12:25 +0100
+
 trac-xmlrpc (1.1.2+svn13939~aroth~ppa3) xenial; urgency=medium
 
   * switch to pybuild
