@@ -1,3 +1,11 @@
+trac-xmlrpc (1.1.8+svn17497-2) disco; urgency=medium
+
+  * Automatic update 1.1.8 from https://trac-
+    hacks.org/browser/xmlrpcplugin/trunk/?format=zip&rev=17497
+    revision 17497
+
+ -- Andreas Roth <aroth@arsoft-online.com>  Mon, 16 Sep 2019 19:25:36 +0200
+
 trac-xmlrpc (1.1.8+svn17497-1) disco; urgency=medium
 
   * Automatic update 1.1.8 from https://trac-
