@@ -19,7 +19,7 @@ else :
 
 setup(
     name='TracXMLRPC',
-    version='1.1.8',
+    version='1.1.9',
     license='BSD',
     author='Alec Thomas',
     author_email='alec@swapoff.org',
@@ -34,6 +34,9 @@ setup(
     package_data={
         'tracrpc': ['templates/*.html', 'htdocs/*.js', 'htdocs/*.css']
         },
+    classifiers=[
+        'Framework :: Trac',
+    ],
     entry_points={
         'trac.plugins': 'TracXMLRPC = tracrpc'
         },
