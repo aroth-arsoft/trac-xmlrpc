@@ -14,12 +14,12 @@ try:
     import babel
 except ImportError:
     babel = None
-import genshi
 
 from trac.core import *
 from trac.perm import PermissionError
 from trac.resource import ResourceNotFound
 from trac.util.datefmt import utc
+from trac.util.html import Fragment, Markup
 from trac.util.text import to_unicode
 from trac.web.api import RequestDone
 
@@ -47,7 +47,7 @@ if json:
         1. datetime.datetime => {'__jsonclass__': ["datetime", "<rfc3339str>"]}
         2. tracrpc.api.Binary => {'__jsonclass__': ["binary", "<base64str>"]}
         3. empty => ''
-        4. genshi.builder.Fragment|genshi.core.Markup => unicode
+        4. trac.util.html.Fragment|trac.util.html.Markup => unicode
         5. babel.support.LazyProxy => unicode
         """
 
@@ -61,8 +61,7 @@ if json:
                                 obj.data.encode("base64")]}
             elif obj is empty:
                 return ''
-            elif isinstance(obj, (genshi.builder.Fragment,
-                                  genshi.core.Markup)):
+            elif isinstance(obj, (Fragment, Markup)):
                 return unicode(obj)
             elif babel and isinstance(obj, babel.support.LazyProxy):
                 return unicode(obj)

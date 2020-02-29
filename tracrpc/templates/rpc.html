@@ -1,85 +1,99 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="layout.html" />
+# extends 'layout.html'
+<!DOCTYPE html>
+<html>
   <head>
     <title>Remote Procedure Call (RPC)</title>
   </head>
 
   <body>
-    <div id="content" class="wiki">
-      <div class="wikipage searchable">
-        <h1>Remote Procedure Call (RPC)</h1>
-        <p><strong>Installed API version :</strong> ${rpc.version} </p>
-        <h2 id="Protocols">Protocol reference:</h2>
-        <p>Below you will find a detailed description of all the RPC
-          protocols installed in this environment. This includes
-          supported content types as well as target URLs for
-          anonymous and authenticated access. Use this
-          information to interact with this environment from
-          a remote location.
-        </p>
-        <p>Libraries for remote procedure calls and parsing exists
-          for most major languages and platforms - use a tested, standard library
-          for consistent results.</p>
-        <dl py:for="protocol in rpc.protocols">
-          <h3 id="${protocol[0]}">${protocol[0]}</h3>
-          <dd>
-            <p>For ${protocol[0]} protocol, use any one of:</p>
-            <ul>
-              <li py:for="ct, _ct_group in groupby(protocol[2], lambda (_, x) : x)">
-                <tt>{'Content-Type': '$ct'}</tt> header with request to:
-                <py:with vars="ct_group = list(_ct_group)">
-                  <ul>
-                    <li py:for="h, _ in ct_group">
-                      <a href="${req.abs_href(h)}">${req.abs_href(h)}</a>
-                      for anonymous access
-                    </li>
-                    <li py:for="h, _ in ct_group">
-                      <a href="${req.abs_href.login(h)}">${req.abs_href.login(h)}</a>
-                      for authenticated access
-                    </li>
-                  </ul>
-                </py:with>
-              </li>
-            </ul>
-          <div>
-            ${wiki_to_html(context, expand_docs(protocol[1], locals()['__data__']))}
-          </div>
-          </dd>
-        </dl>
-
-        <h2 id="Methods">RPC exported functions</h2>
-
-        <div id="searchable">
-          <dl py:for="key in sorted(rpc.functions)" py:with="namespace = rpc.functions[key]">
-            <h3 id="${'rpc.' + to_unicode(namespace.namespace)}">
-              ${namespace.namespace} - ${namespace.description}
-            </h3>
+    # block content
+    <div id="content" class="${classes('wiki', narrow=not fullwidth)}">
+      <div id="wikipage" class="trac-content borderless">
+        <div class="wikipage searchable">
+          <h1 class="section">Remote Procedure Call (RPC)</h1>
+          <p><strong>Installed API version :</strong> ${rpc.version} </p>
+          <h2 class="section" id="Protocols">Protocol reference:</h2>
+          <p>Below you will find a detailed description of all the RPC
+            protocols installed in this environment. This includes
+            supported content types as well as target URLs for
+            anonymous and authenticated access. Use this
+            information to interact with this environment from
+            a remote location.
+          </p>
+          <p>Libraries for remote procedure calls and parsing exists
+            for most major languages and platforms - use a tested, standard library
+            for consistent results.</p>
+          # for protocol in rpc.protocols
+          <dl>
+            <h3 class="section" id="${protocol[0]}">${protocol[0]}</h3>
             <dd>
-              <table class="listing tickets">
-                <thead>
-                  <tr>
-                    <th style="width:40%">Function</th>
-                    <th style="width:45%">Description</th>
-                    <th style="width:15%">Permission required</th>
-                  </tr>
-                </thead>
-                <tbody py:for="idx, function in enumerate(namespace.methods)">
-                  <tr class="${'color3-' + (idx % 2 == 0 and 'even' or 'odd')}">
-                    <td style="padding-left:4em;text-indent:-4em">${function[0]}</td>
-                    <td>${function[1]}</td>
-                    <td>${function[2] or "By resource"}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <p>For ${protocol[0]} protocol, use any one of:</p>
+              <ul>
+                # for ct, _ct_group in protocol[2] | groupby(1)
+                <li>
+                  <tt>{'Content-Type': '${ct}'}</tt> header with request to:
+                    # set ct_group = _ct_group | list
+                    <ul>
+                    # for h, _ in ct_group
+                      <li py:for="h, _ in ct_group">
+                        <a href="${req.abs_href(h)}">${req.abs_href(h)}</a>
+                        for anonymous access
+                      </li>
+                    # endfor
+                    # for h, _ in ct_group
+                      <li py:for="h, _ in ct_group">
+                        <a href="${req.abs_href.login(h)}">${req.abs_href.login(h)}</a>
+                        for authenticated access
+                      </li>
+                    # endfor
+                    </ul>
+                  </py:with>
+                </li>
+                # endfor
+              </ul>
+            <div>
+          ${wiki_to_html(context, expand_docs(protocol[1], {'req': req, 'rpc': rpc, 'authname': req.authname}))}
+            </div>
             </dd>
           </dl>
+          # endfor
+
+          <h2 class="section" id="Methods">RPC exported functions</h2>
+
+          <div id="searchable">
+            # for key in sorted(rpc.functions)
+            #   set namespace = rpc.functions[key]
+            <dl>
+              <h3 class="section" id="${'rpc.' + to_unicode(namespace.namespace)}">
+                ${namespace.namespace} - ${namespace.description}
+              </h3>
+              <dd>
+                <table class="listing tickets">
+                  <thead>
+                    <tr>
+                      <th style="width:40%">Function</th>
+                      <th style="width:45%">Description</th>
+                      <th style="width:15%">Permission required</th>
+                    </tr>
+                  </thead>
+                  # for function in namespace.methods
+                  <tbody>
+                    <tr class="${'color3-' + (loop.index0 % 2 == 0 and 'even' or 'odd')}">
+                      <td style="padding-left:4em;text-indent:-4em">${function[0]}</td>
+                      <td>${function[1]}</td>
+                      <td>${function[2] or "By resource"}</td>
+                    </tr>
+                  </tbody>
+                  # endfor
+                </table>
+              </dd>
+            </dl>
+            # endfor
+          </div>
         </div>
       </div>
     </div>
+    ${ super() }
+    # endblock content
   </body>
 </html>

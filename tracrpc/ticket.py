@@ -9,8 +9,6 @@ License: BSD
 import inspect
 from datetime import datetime
 
-import genshi
-
 from trac.attachment import Attachment
 from trac.core import *
 from trac.perm import PermissionError
@@ -18,9 +16,10 @@ from trac.resource import Resource, ResourceNotFound
 import trac.ticket.model as model
 import trac.ticket.query as query
 from trac.ticket.api import TicketSystem
-from trac.ticket.notification import TicketNotifyEmail
+from trac.ticket.notification import NotificationEvent, NotificationSystem, TicketChangeEvent
 from trac.ticket.web_ui import TicketModule
 from trac.web.chrome import add_warning
+from trac.util.html import Element, Fragment
 from trac.util.datefmt import to_datetime, utc
 from trac.util.text import to_unicode
 
@@ -116,7 +115,7 @@ class TicketRPC(Component):
         t = model.Ticket(self.env, id)
         actions = []
         for action in ts.get_available_actions(req, t):
-            fragment = genshi.builder.Fragment()
+            fragment = Fragment()
             hints = []
             first_label = None
             for controller in ts.action_controllers:
@@ -129,7 +128,7 @@ class TicketRPC(Component):
                     first_label = first_label == None and label or first_label
             controls = []
             for elem in fragment.children:
-                if not isinstance(elem, genshi.builder.Element):
+                if not isinstance(elem, Element):
                     continue
                 if elem.tag == 'input':
                     controls.append((elem.attrib.get('name'),
@@ -153,8 +152,8 @@ class TicketRPC(Component):
         """ Fetch a ticket. Returns [id, time_created, time_changed, attributes]. """
         t = model.Ticket(self.env, id)
         req.perm(t.resource).require('TICKET_VIEW')
-        t['_ts'] = str(to_utimestamp(t.time_changed))
-        return (t.id, t.time_created, t.time_changed, t.values)
+        t['_ts'] = str(to_utimestamp(t['changetime']))
+        return (t.id, t['time'], t['changetime'], t.values)
 
     def create(self, req, summary, description, attributes={}, notify=False, when=None):
         """ Create a new ticket, returning the ticket ID.
@@ -177,8 +176,8 @@ class TicketRPC(Component):
         t.insert(when=when)
         if notify:
             try:
-                tn = TicketNotifyEmail(self.env)
-                tn.notify(t, newticket=True)
+                event = NotificationEvent('ticket', 'created', t, when, req.authname)
+                NotificationSystem(self.env).notify(event)
             except Exception, e:
                 self.log.exception("Failure sending notification on creation "
                                    "of ticket #%s: %s", t.id, e)
@@ -269,8 +268,9 @@ class TicketRPC(Component):
                     controller.apply_action_side_effects(req, t, action)
         if notify:
             try:
-                tn = TicketNotifyEmail(self.env)
-                tn.notify(t, newticket=False, modtime=when)
+                event = TicketChangeEvent('changed', t, when, author, comment,
+                                          changes, action)
+                NotificationSystem(self.env).notify(event)
             except Exception, e:
                 self.log.exception("Failure sending notification on change of "
                                    "ticket #%s: %s", t.id, e)
